@@ -3,6 +3,7 @@ FROM docker:1
 ENV MAVEN_VERSION 3.3.9
 
 RUN apk --update add tar
+RUN apk --update add bash
 
 RUN mkdir -p /usr/share/maven \
   && curl -fsSL http://apache.osuosl.org/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
