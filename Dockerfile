@@ -1,15 +1,24 @@
-FROM docker:1
+FROM maven:3.3.9
 
-ENV MAVEN_VERSION 3.3.9
+RUN apt-get update && apt-get install -y --no-install-recommends \
+		ca-certificates \
+		curl \
+		openssl
 
-RUN apk --update add tar
-RUN apk --update add bash
+ENV DOCKER_BUCKET get.docker.com
+ENV DOCKER_VERSION 1.11.2
+ENV DOCKER_SHA256 8c2e0c35e3cda11706f54b2d46c2521a6e9026a7b13c7d4b8ae1f3a706fc55e1
 
-RUN mkdir -p /usr/share/maven \
-  && curl -fsSL http://apache.osuosl.org/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
-    | tar -xzC /usr/share/maven --strip-components=1 \
-  && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+RUN set -x \
+	&& curl -fSL "https://${DOCKER_BUCKET}/builds/Linux/x86_64/docker-$DOCKER_VERSION.tgz" -o docker.tgz \
+	&& echo "${DOCKER_SHA256} *docker.tgz" | sha256sum -c - \
+	&& tar -xzvf docker.tgz \
+	&& mv docker/* /usr/local/bin/ \
+	&& rmdir docker \
+	&& rm docker.tgz \
+	&& docker -v
 
-ENV MAVEN_HOME /usr/share/maven
+COPY docker-entrypoint.sh /usr/local/bin/
 
-VOLUME /root/.m2
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["sh"]
