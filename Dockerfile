@@ -1,4 +1,4 @@
-FROM maven:3.3.9
+FROM maven:3.9.9
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 		ca-certificates \
